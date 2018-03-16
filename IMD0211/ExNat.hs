@@ -84,28 +84,32 @@ odd = not . even
 
 -- multiplication
 (<*>) :: Nat -> Nat -> Nat
-(<*>) Zero _     = Zero
-(<*>) _ Zero     = Zero
-(<*>) n (Succ m) = n <+> (n <*> m)
+(<*>) n m = mult' n m Zero where
+  mult' Zero _ acc     = acc
+  mult' _ Zero acc     = acc
+  mult' n (Succ m) acc = mult' n m (n <+> acc)
 
 -- exponentiation
 (<^>) :: Nat -> Nat -> Nat
-(<^>) _ Zero     = Succ Zero
-(<^>) n (Succ m) = n <*> (n <^> m)
+(<^>) n m = pow' n m (Succ Zero) where
+  pow' _ Zero acc = acc
+  pow' n (Succ m) acc = pow' n m (n <*> acc)
 
 -- quotient
 (</>) :: Nat -> Nat -> Nat
-(</>) Zero _ = Zero
-(</>) _ Zero = error "Division by zero"
-(</>) n m
-  | n == m    = Succ Zero
-  | n <= m    = Zero
-  | otherwise = Succ $ n <-> m </> m
+(</>) n m = quot' n m Zero where
+  quot' n (Succ Zero) _ = n
+  quot' _ Zero _        = error "Division by zero"
+  quot' Zero _ acc      = acc
+  quot' n m acc
+    | n == m    = Succ acc
+    | n < m     = acc
+    | otherwise = quot' (n <-> m) m (Succ acc)
 
 -- remainder
 (<%>) :: Nat -> Nat -> Nat
-(<%>) Zero _ = Zero
 (<%>) _ Zero = error "Division by zero"
+(<%>) Zero _ = Zero
 (<%>) n m
   | n == m    = Zero
   | n <= m    = n
@@ -128,8 +132,9 @@ absDiff (Succ n) (Succ m) = absDiff n m
 (|-|) = absDiff
 
 factorial :: Nat -> Nat
-factorial Zero     = Succ Zero
-factorial (Succ n) = Succ n <*> (factorial n)
+factorial n = factorial' n (Succ Zero) where
+  factorial' Zero acc     = acc
+  factorial' (Succ n) acc = factorial' n (acc <*> (Succ n))
 
 -- signum of a number (-1, 0, or 1)
 sg :: Nat -> Nat
@@ -138,11 +143,12 @@ sg _    = Succ Zero
 
 -- lo b a is the floor of the logarithm base b of a
 lo :: Nat -> Nat -> Nat
-lo _ Zero = undefined
-lo Zero _ = Zero
-lo (Succ Zero) _ = undefined
-lo _ (Succ Zero) = Zero
-lo n m = if m >= n then Succ $ lo n (m </> n) else Zero
+lo n m = lo' n m Zero where
+  lo' _ Zero _ = undefined
+  lo' Zero _ acc = acc
+  lo' (Succ Zero) _ _ = undefined
+  lo' _ (Succ Zero) acc = acc
+  lo' n m acc = if m >= n then lo' n (m </> n) (Succ acc) else acc
 
 --
 -- For the following functions we need Num(..).
