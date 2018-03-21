@@ -39,20 +39,20 @@ instance Eq Nat where
 
 instance Ord Nat where
 
-    (<=) Zero _ = True
-    (<=) _ Zero = False
+    (<=) Zero _            = True
+    (<=) _ Zero            = False
     (<=) (Succ m) (Succ n) = m <= n
 
     -- Ord does not require defining min and max.
     -- Howevener, you should define them without using (<=).
     -- Both are binary functions: max m n = ..., etc.
 
-    min _ Zero = Zero
-    min Zero _ = Zero
+    min _ Zero            = Zero
+    min Zero _            = Zero
     min (Succ n) (Succ m) = Succ $ min n m
 
-    max n Zero = n
-    max Zero n = n
+    max n Zero            = n
+    max Zero n            = n
     max (Succ n) (Succ m) = Succ $ max n m
 
 isZero :: Nat -> Bool
@@ -96,7 +96,7 @@ odd = not . even
 -- exponentiation
 (<^>) :: Nat -> Nat -> Nat
 (<^>) n m = pow' n m (Succ Zero) where
-  pow' _ Zero acc = acc
+  pow' _ Zero acc     = acc
   pow' n (Succ m) acc = pow' n m (n <*> acc)
 
 -- quotient
@@ -148,11 +148,11 @@ sg _    = Succ Zero
 -- lo b a is the floor of the logarithm base b of a
 lo :: Nat -> Nat -> Nat
 lo n m = lo' n m Zero where
-  lo' _ Zero _ = undefined
-  lo' Zero _ acc = acc
-  lo' (Succ Zero) _ _ = undefined
+  lo' _ Zero _          = undefined
+  lo' Zero _ acc        = acc
+  lo' (Succ Zero) _ _   = undefined
   lo' _ (Succ Zero) acc = acc
-  lo' n m acc = if m >= n then lo' n (m </> n) (Succ acc) else acc
+  lo' n m acc           = if m >= n then lo' n (m </> n) (Succ acc) else acc
 
 --
 -- For the following functions we need Num(..).
@@ -162,11 +162,11 @@ lo n m = lo' n m Zero where
 toNat :: Integral a => a -> Nat
 toNat 0 = Zero
 toNat n
-  | n < 0 = error "Cannot assign a negative value to a Natural"
+  | n < 0     = error "Cannot assign a negative value to a Natural"
   | otherwise = Succ $ toNat (n - 1)
 
 fromNat :: Integral a => Nat -> a
-fromNat Zero = 0
+fromNat Zero     = 0
 fromNat (Succ n) = 1 + fromNat n
 
 
@@ -178,7 +178,4 @@ instance Num Nat where
   (-) = (<->)
   abs n = n
   signum = sg
-  fromInteger x
-    | x < 0     = error "Cannot assign a negative value to a Natural"
-    | x == 0    = Zero
-    | otherwise = Succ $ fromInteger (x - 1)
+  fromInteger = toNat
