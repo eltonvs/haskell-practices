@@ -10,36 +10,46 @@ module Comb ( arrange
 
 -- factorial (might be useful)
 fact :: Integral a => a -> a
-fact = undefined
+fact n = fact' n 1 where
+  fact' 0 acc = acc
+  fact' n acc = fact' (n - 1) (n * acc)
 
 -- no. of permutations of n items
 arrange :: Integral a => a -> a
-arrange = undefined
+arrange = fact
 
 -- P(n,r)
 perm :: Integral a => a -> a -> a
-perm = undefined
+perm _ 0 = 1
+perm n r
+  | n == r = fact n
+  | otherwise = quot (fact n) $ fact $ n - r
 
 -- C(n,r)
 comb :: Integral a => a -> a -> a
-comb = undefined
+comb _ 0 = 1
+comb n r
+  | n == r = 1
+  | otherwise = quot (fact n) $ fact r * (fact $ n - r)
 
 -- Combinations n over r with repetitions
 combRep :: Integral a => a -> a -> a
-combRep = undefined
+combRep n r = comb (n + r - 1) r
 
 -- Binomial coefficients
 bicoefs :: Integral a => a -> [a]
-bicoefs = undefined
+bicoefs n = bicoefs' n n [1] where
+  bicoefs' n 0 acc = acc
+  bicoefs' n m (x:xs) = bicoefs' n (m - 1) $ x : [comb n m] ++ xs
 
 -- derangements: how many permutations of n objects
 -- do not leave ANY item in its original position
-derange :: Integral a => a -> a
+derange :: Integral a => a -> [a]
 derange = undefined
 
 -- Pascal triangle (infinite!) (See below its first 10 terms)
 pascal :: Integral a => [[a]]
-pascal = undefined
+pascal = [bicoefs n | n <- [0..]]
 
 -- given to pretty-print the first n terms of your pascal funcion
 prettyPascal :: Int -> IO ()
