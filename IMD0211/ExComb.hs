@@ -45,7 +45,9 @@ bicoefs n = bicoefs' n n [1] where
 -- derangements: how many permutations of n objects
 -- do not leave ANY item in its original position
 derange :: Integral a => a -> a
-derange = undefined
+derange 1 = 0
+derange 2 = 1
+derange n = (n - 1) * (derange (n - 1) + derange(n - 2))
 
 -- Pascal triangle (infinite!) (See below its first 10 terms)
 pascal :: Integral a => [[a]]
