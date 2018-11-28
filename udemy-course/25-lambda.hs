@@ -1,0 +1,1 @@
+powlambda = \x -> (x * x)
